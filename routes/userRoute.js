@@ -4,6 +4,7 @@ const { StatusCodes } = require('http-status-codes');
 const userServices = require('../services/userService');
 const jwt = require('jsonwebtoken');
 const MetaModel = require('../models/system/MetaModel');
+const bcrypt = require('bcryptjs');
 
 require('dotenv').config();
 
@@ -59,12 +60,16 @@ router.post('/login', async (req, res) => {
             expiresIn: '48h',
         });
 
-        // save user token
-        user.token = token;
-
         // user
         meta.setSuccessMessage(StatusCodes.OK);
-        return res.json({ data: user, meta });
+        return res.json({
+            data: {
+                id: user.id,
+                email: user.email,
+                token: token,
+            },
+            meta,
+        });
     }
     meta.setFailMessage(StatusCodes.BAD_REQUEST, 'Invalid Credentials');
     res.json({ meta });

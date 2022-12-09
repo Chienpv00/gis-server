@@ -1,10 +1,9 @@
 const db = require('./db');
 const helper = require('../helper');
-const config = require('../config');
 const { StatusCodes, getReasonPhrase } = require('http-status-codes');
 
 async function getAllUser() {
-    const data = await db.query(`SELECT * FROM test`);
+    const data = await db.query(`SELECT id, email FROM user`);
     const meta = {
         code: StatusCodes.OK,
         message: getReasonPhrase(StatusCodes.OK),
@@ -15,19 +14,17 @@ async function getAllUser() {
     };
 }
 async function findUserByEmail(email) {
-    return { email: '', password: '' };
-    return await db.query(`SELECT 1 from test where email = '${email}'`);
+    let t = await db.query(`SELECT id, email, password from user where email = '${email}'`);
+    return t[0];
 }
 
 async function createUser(user) {
-    const result = await db.query(``);
+    const result = await db.query(`INSERT INTO user(email, password) VALUES('${user.email}', '${user.password}')`);
     if (result.affectedRows) {
         return true;
     } else {
         return false;
     }
 }
-
-async function register() {}
 
 module.exports = { getAllUser, findUserByEmail, createUser };

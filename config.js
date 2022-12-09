@@ -10,7 +10,6 @@ const config = {
         password: p.PASSWORD,
         database: p.DATABASE,
         dateStrings: 'date',
-        dialect: 'mysql',
         pool: {
             max: 5,
             min: 0,

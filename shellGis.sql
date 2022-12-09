@@ -14,18 +14,27 @@ create table test (
 
 -- tabel user
 CREATE TABLE user (
-	email VARCHAR(50) NOT NULL ,  
-    password VARCHAR(50) NOT NULL,
+	id MEDIUMINT NOT NULL AUTO_INCREMENT,
+	email VARCHAR(50) NOT NULL UNIQUE , 
+    password VARCHAR(100) NOT NULL,
+    token varchar(50),
     modifiedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     createdDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (email)  
+    PRIMARY KEY (id)  
 );
-ALTER TABLE user
-ADD token varchar(50) ;
 
-ALTER TABLE user
-MODIFY COLUMN password varchar(100);
 
+
+
+-- ALTER TABLE user
+-- ADD token varchar(50) ;
+-- ALTER TABLE user
+-- ADD id MEDIUMINT NOT NULL AUTO_INCREMENT;
+
+-- ALTER TABLE user
+-- MODIFY COLUMN password varchar(100);
+
+-- drop table user;
 -- ALTER TABLE user
 -- MODIFY COLUMN token varchar(50);
 
