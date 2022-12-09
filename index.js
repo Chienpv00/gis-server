@@ -1,23 +1,17 @@
 const express = require('express');
-const db = require('./config/db');
+const app = require('./app');
 const testRoute = require('./routes/test');
+const userRoute = require('./routes/userRoute');
 
 require('dotenv').config();
 
-const app = express();
+const { API_PORT } = process.env;
+const port = process.env.PORT || API_PORT;
 
-const port = process.env.PORT || 4000;
-
-db.connect((err) => {
-    err ? console('err: ', err) : console.log('Connected DB!');
-});
-
-db.query('select * from test', (err, result) => {
-    err && console.log('err');
-    console.log(result);
-});
+app.use(express.json());
 
 app.use('/api/', testRoute);
+app.use('/api/user', userRoute);
 
 app.listen(port, () => {
     console.log('Express are running on port: ', port);

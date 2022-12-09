@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const HttpStatus = require('http-status-codes');
 
-const db = require('../config/db');
+const db = require('../config/database');
 
 router.get('/test', async (req, res) => {
     try {
