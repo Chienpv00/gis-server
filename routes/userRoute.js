@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const { StatusCodes } = require('http-status-codes');
-const userServices = require('../services/userService');
 const jwt = require('jsonwebtoken');
 const MetaModel = require('../models/system/MetaModel');
 const bcrypt = require('bcryptjs');
+
+// db
+const TestModel = require('../models/database/TestModel');
 
 require('dotenv').config();
 
 // Register
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
-    let meta = new MetaModel();
+
+    let data = await TestModel.find();
+    return res.json(data);
 
     // Validate user input
     if (!(password && email)) {
@@ -22,7 +26,7 @@ router.post('/register', async (req, res) => {
     }
 
     // find user in database
-    const checkEmailExist = await userServices.findUserByEmail(email);
+    const checkEmailExist = await UserModel.findOne({ email: email });
     if (checkEmailExist) {
         meta.setFailMessage(StatusCodes.CONFLICT, 'User exists in database!');
         return res.json({
@@ -30,7 +34,12 @@ router.post('/register', async (req, res) => {
         });
     }
     req.body.password = await bcrypt.hash(password, 10);
-    const createdUser = await userServices.createUser(req.body);
+    const user = new UserModel({
+        email: email,
+        password: req.body.password,
+        token: null,
+    });
+    const createdUser = await user.save();
     if (createdUser) {
         meta.setSuccessMessage(StatusCodes.CREATED, 'User created successfull!');
     } else
@@ -42,37 +51,37 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    let meta = new MetaModel();
-    if (!(password && email)) {
-        meta.setFailMessage(StatusCodes.LENGTH_REQUIRED, 'All input fields must be required.');
-        return res.json({
-            meta,
-        });
-    }
+// router.post('/login', async (req, res) => {
+//     const { email, password } = req.body;
+//     let meta = new MetaModel();
+//     if (!(password && email)) {
+//         meta.setFailMessage(StatusCodes.LENGTH_REQUIRED, 'All input fields must be required.');
+//         return res.json({
+//             meta,
+//         });
+//     }
 
-    const user = await userServices.findUserByEmail(email);
+//     const user = await userServices.findUserByEmail(email);
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-        // Create token
-        const token = jwt.sign({ user_id: user.id, email }, process.env.TOKEN_KEY, {
-            expiresIn: '48h',
-        });
+//     if (user && (await bcrypt.compare(password, user.password))) {
+//         // Create token
+//         const token = jwt.sign({ user_id: user.id, email }, process.env.TOKEN_KEY, {
+//             expiresIn: '48h',
+//         });
 
-        // user
-        meta.setSuccessMessage(StatusCodes.OK);
-        return res.json({
-            data: {
-                id: user.id,
-                email: user.email,
-                token: token,
-            },
-            meta,
-        });
-    }
-    meta.setFailMessage(StatusCodes.BAD_REQUEST, 'Invalid Credentials');
-    res.json({ meta });
-});
+//         // user
+//         meta.setSuccessMessage(StatusCodes.OK);
+//         return res.json({
+//             data: {
+//                 id: user.id,
+//                 email: user.email,
+//                 token: token,
+//             },
+//             meta,
+//         });
+//     }
+//     meta.setFailMessage(StatusCodes.BAD_REQUEST, 'Invalid Credentials');
+//     res.json({ meta });
+// });
 
 module.exports = router;
