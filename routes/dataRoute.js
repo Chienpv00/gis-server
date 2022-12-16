@@ -9,4 +9,11 @@ router.get('/getData', async (req, res) => {
     res.status(200).json(data);
 });
 
+router.post('/addData', async (req, res) => {
+    const { name, data, size, color, meta } = req.body;
+    const newData = new DataModel({ name, data, size, color, meta });
+    const result = await newData.save();
+    res.status(200).json(result);
+});
+
 module.exports = router;
